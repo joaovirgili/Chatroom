@@ -1,0 +1,19 @@
+#usersDiv {
+    position: absolute;
+    border: 1px solid;
+    height: 246px;
+    width: 108px;
+    display: inline-block;
+}
+input {
+    width: 108px;
+}
+#messageText { 
+    width: 338px;
+}
+ul {
+    padding: 0 10px 0 10px;
+}
+li {
+    list-style-type: none;
+}
