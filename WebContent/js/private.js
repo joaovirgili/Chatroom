@@ -1,5 +1,5 @@
 var names = getAllUrlParams();
-var websocket2 = new WebSocket("ws://localhost:8080/Chatroom04/privateServerEndpoint/" +
+var websocket2 = new WebSocket("ws://localhost:8049/Chatroom03/privateServerEndpoint/" +
 names.user1 + "/" +
 names.user2 + "/" +
 Math.floor((Math.random() * 10000) + 1));

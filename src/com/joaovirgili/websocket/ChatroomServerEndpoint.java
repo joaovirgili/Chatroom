@@ -22,7 +22,7 @@ public class ChatroomServerEndpoint {
 	
 	@OnOpen
 	public void handleOpen(Session userSession) throws IOException, JSONException {
-		System.out.println("Users online list.");
+		System.out.println("Users online list:");
 		messageAllSessions(buildUsersJson());
 		chatroomUsers.add(userSession);
 	}
@@ -30,13 +30,19 @@ public class ChatroomServerEndpoint {
 	@OnMessage
 	public void handleMessage(String message, Session userSession) throws IOException, JSONException {
 		String username = (String) userSession.getUserProperties().get("username");
-		
-		if (username == null) {
-			userSession.getUserProperties().put("username", message);
+		JSONObject jsonObj = new JSONObject(message);
+		if (jsonObj.has("username") && username == null) {
+			userSession.getUserProperties().put("username", jsonObj.get("username"));
 			messageAllSessions(buildUsersJson());
 			printUsersOnline();
-		} else {
-			messageAllSessions(buildJsonData(username, message));
+		} else if (jsonObj.has("message")){
+			messageAllSessions(buildJsonMessage(username, message));
+		} else if (jsonObj.has("notify")) {
+			String userToNotify = jsonObj.getString("notify");
+			Session session = searchUser(userToNotify);
+			if (session != null) {
+				session.getBasicRemote().sendText(buildNotifierJson("teste"));
+			}
 		}
 	}
 	
@@ -44,6 +50,8 @@ public class ChatroomServerEndpoint {
 	public void handleClose(Session userSession) throws IOException, JSONException {
 		chatroomUsers.remove(userSession);
 		messageAllSessions(buildUsersJson());
+		if (chatroomUsers.size() == 0)
+			System.out.println("No users online.");
 	}
 	
 	private void messageAllSessions(String message) throws IOException, JSONException {
@@ -53,7 +61,13 @@ public class ChatroomServerEndpoint {
 		}
 	}
 	
-	private String buildJsonData (String username, String message) throws JSONException {
+	private String buildNotifierJson (String message) throws JSONException {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("notify", message);
+		return jsonObject.toString();
+	}
+	
+	private String buildJsonMessage (String username, String message) throws JSONException {
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("message", username + ": " + message);
 		return jsonObject.toString();
@@ -72,7 +86,17 @@ public class ChatroomServerEndpoint {
 	
 	private void printUsersOnline() {
 		for (int i=0;i<chatroomUsers.size();i++) 
-			System.out.println("Users " + i + ": " + chatroomUsers.get(i).getUserProperties().get("username"));
+			System.out.println("User " + i + ": " + chatroomUsers.get(i).getUserProperties().get("username"));
 		System.out.println();
+	}
+	
+	private Session searchUser(String username) {
+		Session session;
+		for (int i=0;i<chatroomUsers.size();i++) {
+			session = chatroomUsers.get(i);
+			if (session.getUserProperties().get("username").equals(username))
+				return session;
+		}
+		return null;
 	}
 }

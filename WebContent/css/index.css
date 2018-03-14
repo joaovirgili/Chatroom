@@ -1,10 +1,4 @@
-#usersDiv {
-    border: 1px solid;
-    height: 246px;
-    width: 108px;
-    /* position: fixed; */
-    /*display: inline-block;*/
-}
+
 input {
     width: 108px;
 }
@@ -26,4 +20,39 @@ li {
     height: 50px; 
     border: 1px solid;
     display: none;
+}
+#divChats {
+    width: 92%;
+    height: 380px;
+    position: fixed;
+    bottom: 0;
+    border: 1px solid;
+}
+.chats {
+    display: inline-block;
+    border: 1px solid;
+    height: 380px;
+    width: 350px;
+}
+
+
+.usersDiv {
+    display: inline-block;
+    border: 1px solid;
+    height: 246px;
+    width: 108px;
+}
+
+.usersDivPrivate {
+    display: inline-block;
+    border: 1px solid;
+    height: 246px;
+    width: 108px;
+}
+
+#inputMessage {
+    width: 198px;
+}
+#privateUsersDiv {
+    position: absolute;
 }

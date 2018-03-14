@@ -32,7 +32,7 @@ public class PrivateServerEndpoint {
 			@PathParam("roomId") final int roomId) throws IOException, JSONException {
 		System.out.println("Private - " + String.valueOf(roomId));
 		
-		//Cria sala e verifica se j� existe uma sala com esses usu�rios.
+		//Cria sala e verifica se ja existe uma sala com esses usuarios.
 		Chatroom chatroom = new Chatroom(username1, username2, roomId);
 		int auxId = AllChatrooms.getInstance().roomExists(chatroom);
 		if (auxId == -1) 
@@ -40,21 +40,24 @@ public class PrivateServerEndpoint {
 		else 
 			chatroom = AllChatrooms.getInstance().searchRoom(auxId);
 		
-		userSession.getUserProperties().put("roomId", auxId);
+		userSession.getUserProperties().put("roomId", chatroom.getId());
 		messageAllSessions(buildUsersJson(userSession));
 		chatroomUsers.add(userSession);
+		AllChatrooms.getInstance().printRooms();
+		printUsers();
 	}
 	
 	@OnMessage
 	public void handleMessage(String message, Session userSession) throws IOException, JSONException {
 		String username = (String) userSession.getUserProperties().get("username");
+		JSONObject jsonMessage = new JSONObject(message);
 		
-		if (username == null) {
-			userSession.getUserProperties().put("username", message);
-			messageAllSessions(buildJsonData("System", message + " entrou."));
+		if (username == null && jsonMessage.has("username")) {
+			userSession.getUserProperties().put("username", jsonMessage.get("username"));
+			messageAllSessions(buildJsonData("System", jsonMessage.get("username") + " entrou."));
 			messageAllSessions(buildUsersJson(userSession));
-		} else {
-			messageAllSessions(buildJsonData(username, message));
+		} else if (jsonMessage.has("message")){
+			messageAllSessions(buildJsonData(username, jsonMessage.getString("message")));
 		}
 	}
 	
@@ -71,9 +74,6 @@ public class PrivateServerEndpoint {
 			if (chatroomUsers.get(i).getUserProperties().get("username") != null)
 				chatroomUsers.get(i).getBasicRemote().sendText(message);
 		}
-		/*Iterator<Session> iterator = chatroomUsers.iterator();
-		while (iterator.hasNext())
-			iterator.next().getBasicRemote().sendText(message);*/
 			
 	}
 	
@@ -94,4 +94,14 @@ public class PrivateServerEndpoint {
 		jsonObject.put("users", usernames);
 		return jsonObject.toString();
 	}
+	
+	private void printUsers() {
+		for (int i=0; i<chatroomUsers.size();i++) {
+			System.out.println("Usuario(" + i +") Id(" +
+					chatroomUsers.get(i).getUserProperties().get("roomId") +"): " + 
+					chatroomUsers.get(i).getUserProperties().get("username")); 
+		}
+	}
+	
+
 }

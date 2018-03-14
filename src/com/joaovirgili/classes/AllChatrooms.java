@@ -63,4 +63,18 @@ public class AllChatrooms {
 		
 		return null;
 	}
+	
+	public void printRooms() {
+		Chatroom auxChat;
+		for (int i=0; i<chatrooms.size();i++) {
+			auxChat = chatrooms.get(i);
+			System.out.print("Room (" + i + ") id(" + auxChat.getId()+ "): ");
+			for (int j=0; j<auxChat.getNumberOfUsers(); j++) {
+				System.out.print(auxChat.getUsers().get(j));
+				if (j+1 != auxChat.getNumberOfUsers())
+					System.out.print(", ");
+			}
+			System.out.println();
+		}
+	}
 }
