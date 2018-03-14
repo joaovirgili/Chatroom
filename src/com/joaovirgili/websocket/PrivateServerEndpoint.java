@@ -32,7 +32,7 @@ public class PrivateServerEndpoint {
 			@PathParam("roomId") final int roomId) throws IOException, JSONException {
 		System.out.println("Private - " + String.valueOf(roomId));
 		
-		//Cria sala e verifica se já existe uma sala com esses usuários.
+		//Cria sala e verifica se jï¿½ existe uma sala com esses usuï¿½rios.
 		Chatroom chatroom = new Chatroom(username1, username2, roomId);
 		int auxId = AllChatrooms.getInstance().roomExists(chatroom);
 		if (auxId == -1) 
@@ -95,4 +95,3 @@ public class PrivateServerEndpoint {
 		return jsonObject.toString();
 	}
 }
-

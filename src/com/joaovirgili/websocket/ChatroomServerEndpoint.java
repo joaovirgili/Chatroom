@@ -18,12 +18,11 @@ import org.json.JSONObject;
 
 @ServerEndpoint("/chatroomServerEndpoint")
 public class ChatroomServerEndpoint {
-	//static Set<Session> chatroomUsers = Collections.synchronizedSet(new HashSet<Session>());
 	static ArrayList<Session> chatroomUsers = new ArrayList<Session>();
 	
 	@OnOpen
 	public void handleOpen(Session userSession) throws IOException, JSONException {
-		System.out.println("Public");
+		System.out.println("Users online list.");
 		messageAllSessions(buildUsersJson());
 		chatroomUsers.add(userSession);
 	}
@@ -34,8 +33,8 @@ public class ChatroomServerEndpoint {
 		
 		if (username == null) {
 			userSession.getUserProperties().put("username", message);
-			messageAllSessions(buildJsonData("System", message + " entrou."));
 			messageAllSessions(buildUsersJson());
+			printUsersOnline();
 		} else {
 			messageAllSessions(buildJsonData(username, message));
 		}
@@ -44,20 +43,14 @@ public class ChatroomServerEndpoint {
 	@OnClose
 	public void handleClose(Session userSession) throws IOException, JSONException {
 		chatroomUsers.remove(userSession);
-		messageAllSessions(buildJsonData("System", userSession.getUserProperties().get("username") + " saiu."));
 		messageAllSessions(buildUsersJson());
 	}
 	
 	private void messageAllSessions(String message) throws IOException, JSONException {
-
 		for (int i=0; i<chatroomUsers.size();i++) {
 			if (chatroomUsers.get(i).getUserProperties().get("username") != null)
 				chatroomUsers.get(i).getBasicRemote().sendText(message);
 		}
-		/*Iterator<Session> iterator = chatroomUsers.iterator();
-		while (iterator.hasNext())
-			iterator.next().getBasicRemote().sendText(message);*/
-			
 	}
 	
 	private String buildJsonData (String username, String message) throws JSONException {
@@ -75,5 +68,11 @@ public class ChatroomServerEndpoint {
 		
 		jsonObject.put("users", usernames);
 		return jsonObject.toString();
+	}
+	
+	private void printUsersOnline() {
+		for (int i=0;i<chatroomUsers.size();i++) 
+			System.out.println("Users " + i + ": " + chatroomUsers.get(i).getUserProperties().get("username"));
+		System.out.println();
 	}
 }

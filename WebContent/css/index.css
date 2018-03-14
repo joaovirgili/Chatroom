@@ -2,7 +2,8 @@
     border: 1px solid;
     height: 246px;
     width: 108px;
-    display: inline-block;
+    /* position: fixed; */
+    /*display: inline-block;*/
 }
 input {
     width: 108px;
@@ -15,4 +16,14 @@ ul {
 }
 li {
     list-style-type: none;
+}
+.iframes {
+    position: fixed !important;
+    bottom: 0;
+}
+.mini {
+    width: 470px; 
+    height: 50px; 
+    border: 1px solid;
+    display: none;
 }

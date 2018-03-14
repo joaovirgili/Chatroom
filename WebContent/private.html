@@ -8,13 +8,14 @@
 	</head>
 	<body>
 		<h1>Chat privado</h1>
+		<a class="btn" onclick="disconnect();">Fechar</a>
+		<a class="btn" onclick="">Minimizar</a>
 		<textarea readonly="readonly" id="messagesTextArea" cols="45" rows="10"></textarea>
 		
 		<div id="usersDiv"><ul id="usersList"></ul></div>
 		<br>
 		<input type="text" id="messageText" size="50"/>
 		<input type="button" value="Enviar" onclick="sendMessage();">
-		<a type="button" href="index.html">Público</a>
 	
 		
 		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>

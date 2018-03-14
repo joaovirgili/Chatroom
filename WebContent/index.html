@@ -8,14 +8,31 @@
 	</head>
 	<body>
 		<div class="container">
-			<h1>Usuários Online</h1>
-			<textarea readonly="readonly" id="messagesTextArea" cols="45" rows="10" style="display: none;"></textarea>
+			<h1 class="text-center">Chat</h1>
+			<div class="row justify-content-between">
+				<h4>Login</h4>
+				<h4>Usuários online</h4>
+			</div>
+
+			<div class="row justify-content-between">
+				<div>
+					<input type="text" id="messageText" size="50" />
+					<input id="login" type="button" value="Login" onclick="login();">
+					<input id="disconnect" type="button" value="Disconnect" onclick="disconnect();" style="display: none;" >
+				</div>
+
+				<div id="usersDiv">
+					<ul id="usersList"></ul>
+				</div>
+				
+			</div>
+			<div class="iframes">
+				<div class="mini">
+					<p></p>
+				</div>
+				<iframe id="chat" src="" frameborder="0" height="380px" width="470px" style="border: 1px solid;display: none;"></iframe>
+			</div>
 			
-			<div id="usersDiv"><ul id="usersList"></ul></div>
-			<br>
-			<input type="text" id="messageText" size="50" />
-			<input type="button" value="Login" onclick="login();">
-			<a type="button" href="private.html" style="display: none" >Privado</a>
 		</div>
 	
 		
