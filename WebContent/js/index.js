@@ -1,6 +1,6 @@
 var user;
 var publicWebsocket;
-var privateWebsocket = [];
+var privateWebsocket;
 
 function sendMessage() {
     var messageText = $('#inputMessage');
@@ -8,18 +8,26 @@ function sendMessage() {
 
 function openChat(userClicked) {
     randomId = Math.floor((Math.random() * 10000) + 1);
-    var privateWebsocket = connectPrivateWebsocket(user.username, userClicked, randomId);
+    var url = "ws://localhost:8080/Chatroom04/privateServerEndpoint/" + user.username + "/" + userClicked + "/" + randomId;
+    var jsonURL = {
+        notify: url,
+        username: userClicked,
+        from: user.username
+    };
 
+    privateWebsocket = connectPrivateWebsocket(url);
     waitForSocketConnection(privateWebsocket, function () {
         $('#chat').show();
     	privateWebsocket.send(JSON.stringify(user));
     });
-    
+
+    publicWebsocket.send(JSON.stringify(jsonURL));
+
 }
 
 
-function connectPrivateWebsocket(user1, user2, id) {
-    var url = "ws://localhost:8049/Chatroom03/privateServerEndpoint/" + user1 + "/" + user2 + "/" + id;
+function connectPrivateWebsocket(url) {
+    
     var websocket = new WebSocket(url);
     var messageTextArea = document.getElementById("messagesTextArea");
     var ulUsers = $('#privateUsersList');
@@ -29,6 +37,7 @@ function connectPrivateWebsocket(user1, user2, id) {
         //Caso seja uma mensagem a ser exibida no chat
         if (jsonData.message) {
             messageTextArea.value += jsonData.message + "\n";
+        //Caso seja passagem da lista de usuários
         } else if (jsonData.users) {
             $('#privateUsersList').empty();
 		    jsonData = jsonData.users;
@@ -45,29 +54,16 @@ function connectPrivateWebsocket(user1, user2, id) {
 }
 
 function connectPublicWebsocket() {
-	publicWebsocket = new WebSocket("ws://localhost:8049/Chatroom03/chatroomServerEndpoint");
+    publicWebsocket = new WebSocket("ws://localhost:8080/Chatroom04/chatroomServerEndpoint");
 	publicWebsocket.onmessage = function (message) {
         var jsonData = JSON.parse(message.data);
+        //Caso seja passagem da lista de usuários
         if (jsonData.users) {
-            $("#usersList").empty(); 
-            var urlChat;
-            for (let i=0; i< jsonData.users.length; i++)
-                if (jsonData.users[i] != null) {
-                	
-                    urlChat = 'http://localhost:8049/Chatroom03/private.html?user1='+user+'&user2='+jsonData.users[i];
-                    /*li = "<li><a onclick='openChat(";
-                    li+='"'+urlChat+'"';
-                    li+=");'>" + jsonData.users[i] + "</a></li>";*/
-                    li = '<li class="users" onclick="openChat(';
-                    li+= "'"+jsonData.users[i]+"'";
-                    li+= ');">' + jsonData.users[i] + '</li>';
-                    
-                    $("#usersList").append(li); 
-                }  
-            
+            buildUsersList(jsonData);           
         }
-        if (jsonData.notify) {
-            alert("uhul \o/");
+        //Caso seja passagem de notificação para usuário
+        else if (jsonData.notify) {
+            getNotification(jsonData);
         }
     }
 	publicWebsocket.onclose = function() {
@@ -76,9 +72,16 @@ function connectPublicWebsocket() {
     
 }
 
-function login() {
-    
+function getNotification(jsonData) {
+    privateWebsocket = connectPrivateWebsocket(jsonData.notify);
+    var message = { username: jsonData.username };
+    waitForSocketConnection(privateWebsocket, function () {
+        $('#chat').show();
+        privateWebsocket.send(JSON.stringify(message));
+    });
+}
 
+function login() {
     user ={ username: $('#messageText').val() };
     $('#disconnect').show();
     $('#login').hide();
@@ -122,3 +125,21 @@ function search() {
     publicWebsocket.send(JSON.stringify(test));
 }
 
+function buildUsersList(jsonData) {
+    $("#usersList").empty(); 
+    var urlChat;
+    for (let i=0; i< jsonData.users.length; i++)
+    if (jsonData.users[i] != null) {     	
+        urlChat = 'http://localhost:8080/Chatroom04/private.html?user1='+user+'&user2='+jsonData.users[i];
+        li = '<li class="users" onclick="openChat(' + "'"+jsonData.users[i]+"'" + ');">' + jsonData.users[i] + '</li>';
+        //li+= "'"+jsonData.users[i]+"'";
+        //li+= ');">' + jsonData.users[i] + '</li>';
+        $("#usersList").append(li); 
+    }  
+}
+
+function sendMessage() {
+    var text = { message: $('#inputMessage').val() };
+    $('#inputMessage').val("");
+    privateWebsocket.send(JSON.stringify(text)); 
+}

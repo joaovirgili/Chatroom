@@ -33,12 +33,11 @@ public class PrivateServerEndpoint {
 		System.out.println("Private - " + String.valueOf(roomId));
 		
 		//Cria sala e verifica se ja existe uma sala com esses usuarios.
-		Chatroom chatroom = new Chatroom(username1, username2, roomId);
-		int auxId = AllChatrooms.getInstance().roomExists(chatroom);
-		if (auxId == -1) 
+		Chatroom chatroom = AllChatrooms.getInstance().roomExists(roomId);
+		if (chatroom == null) {
+			chatroom = new Chatroom(username1, username2, roomId);
 			AllChatrooms.getInstance().addNewRoom(chatroom);
-		else 
-			chatroom = AllChatrooms.getInstance().searchRoom(auxId);
+		}		
 		
 		userSession.getUserProperties().put("roomId", chatroom.getId());
 		messageAllSessions(buildUsersJson(userSession));

@@ -25,14 +25,21 @@ public class AllChatrooms {
 		chatrooms.remove(room);
 	}
 	
-	public int roomExists (Chatroom room) {
-		Chatroom chatroom;
+	public Chatroom roomExists (int id) {
+		/*Chatroom chatroom;
 		for (int i=0; i<chatrooms.size(); i++) {
 			chatroom = chatrooms.get(i);
 			if (compareRooms(chatroom, room))
 				return room.getId();
 		}
-		return -1;
+		return -1;*/
+		for (int i=0; i<chatrooms.size(); i++) {
+			Chatroom chatroom = chatrooms.get(i);
+			if (chatroom.getId() == id) {
+				return chatroom;
+			}
+		}
+		return null;
 	}
 	
 	private static boolean compareRooms (Chatroom room1, Chatroom room2) {

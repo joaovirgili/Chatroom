@@ -31,19 +31,21 @@ public class ChatroomServerEndpoint {
 	public void handleMessage(String message, Session userSession) throws IOException, JSONException {
 		String username = (String) userSession.getUserProperties().get("username");
 		JSONObject jsonObj = new JSONObject(message);
-		if (jsonObj.has("username") && username == null) {
+		if (jsonObj.has("notify")) {
+			String userToNotify = jsonObj.getString("username");
+			Session session = searchUser(userToNotify);
+			if (session != null) {
+				session.getBasicRemote().sendText(jsonObj.toString());
+			}
+		}
+		else if (jsonObj.has("username") && username == null) {
 			userSession.getUserProperties().put("username", jsonObj.get("username"));
 			messageAllSessions(buildUsersJson());
 			printUsersOnline();
-		} else if (jsonObj.has("message")){
+		} else if (jsonObj.has("message"))
 			messageAllSessions(buildJsonMessage(username, message));
-		} else if (jsonObj.has("notify")) {
-			String userToNotify = jsonObj.getString("notify");
-			Session session = searchUser(userToNotify);
-			if (session != null) {
-				session.getBasicRemote().sendText(buildNotifierJson("teste"));
-			}
-		}
+			
+		
 	}
 	
 	@OnClose
@@ -59,12 +61,6 @@ public class ChatroomServerEndpoint {
 			if (chatroomUsers.get(i).getUserProperties().get("username") != null)
 				chatroomUsers.get(i).getBasicRemote().sendText(message);
 		}
-	}
-	
-	private String buildNotifierJson (String message) throws JSONException {
-		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("notify", message);
-		return jsonObject.toString();
 	}
 	
 	private String buildJsonMessage (String username, String message) throws JSONException {
